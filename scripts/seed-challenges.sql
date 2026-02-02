@@ -42,20 +42,36 @@ VALUES
   ('DNS Enumeration', 'Networking', 'medium', '2025', 'Enumerate DNS records', 'Find subdomains by enumerating DNS records to locate the flag.', 'flag{dns_enumerated}', 25),
   ('Man-in-the-Middle Attack', 'Networking', 'hard', '2025', 'Perform a MITM attack', 'Intercept encrypted traffic using MITM techniques to find the flag.', 'flag{mitm_success}', 50);
 
--- Insert labs for each challenge (using subqueries to get challenge IDs)
+-- Insert labs for selected challenges (using subqueries to get challenge IDs).
+-- Uses ON CONFLICT to avoid duplicate labs if the script is re-run.
 INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'sql-injection-101', 'web', true FROM challenges WHERE title = 'SQL Injection 101'
-UNION ALL
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'xss-vulnerability', 'web', true FROM challenges WHERE title = 'XSS Vulnerability'
-UNION ALL
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'csrf-attack', 'web', true FROM challenges WHERE title = 'CSRF Attack'
-UNION ALL
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'caesar-cipher', 'crypto', true FROM challenges WHERE title = 'Caesar Cipher'
-UNION ALL
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'rsa-encryption', 'crypto', true FROM challenges WHERE title = 'RSA Encryption'
-UNION ALL
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'simple-binary', 'reverse', true FROM challenges WHERE title = 'Simple Binary'
-UNION ALL
-SELECT id, 'memory-dump-analysis', 'forensics', true FROM challenges WHERE title = 'Memory Dump Analysis'
-UNION ALL
-SELECT id, 'packet-analysis', 'forensics', true FROM challenges WHERE title = 'Packet Analysis';
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
+SELECT id, 'memory-analysis', 'forensics', true FROM challenges WHERE title = 'Memory Dump Analysis'
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
+SELECT id, 'packet-analysis', 'networking', true FROM challenges WHERE title = 'Packet Analysis'
+ON CONFLICT (slug) DO NOTHING;

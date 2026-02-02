@@ -4,7 +4,7 @@ import React from "react"
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase, Challenge } from '@/lib/supabase';
+import { supabase, Challenge, Lab } from '@/lib/supabase';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export default function ChallengePage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSolved, setIsSolved] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [labSlug, setLabSlug] = useState<string | null>(null);
+  const [lab, setLab] = useState<Lab | null>(null);
 
   useEffect(() => {
     fetchChallenge();
@@ -43,7 +43,7 @@ export default function ChallengePage() {
 
       setChallenge(data);
       checkIfSolved(data.id);
-      fetchLabSlug(data.id);
+      fetchLabForChallenge(data.id);
     } catch (error) {
       console.error('Error fetching challenge:', error);
     } finally {
@@ -51,22 +51,23 @@ export default function ChallengePage() {
     }
   };
 
-  const fetchLabSlug = async (cId: string) => {
+  const fetchLabForChallenge = async (cId: string) => {
     try {
       const { data, error } = await supabase
         .from('labs')
-        .select('slug')
+        .select('*')
         .eq('challenge_id', cId)
+        .eq('is_active', true)
         .single();
 
       if (error) {
-        console.log('No lab found for this challenge');
+        console.error('Error fetching lab for challenge:', error);
         return;
       }
 
-      setLabSlug(data?.slug || null);
+      setLab(data as Lab);
     } catch (error) {
-      console.log('Error fetching lab:', error);
+      console.error('Error fetching lab for challenge:', error);
     }
   };
 
@@ -227,13 +228,20 @@ export default function ChallengePage() {
               </p>
             </div>
 
-            {labSlug && (
-              <div className="mb-6">
-                <Link href={`/labs/${labSlug}`}>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6">
-                    🧪 Go to Lab
+            {lab && (
+              <div className="mb-6 flex flex-col gap-2">
+                <p className="text-sm text-slate-400">
+                  This challenge has an interactive lab environment where you can exploit the
+                  vulnerability directly.
+                </p>
+                <Link href={`/labs/${lab.slug}`}>
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    Go to Lab
                   </Button>
                 </Link>
+                <p className="text-xs text-slate-500 italic">
+                  Labs are intentionally vulnerable and fully isolated. Use them only for learning.
+                </p>
               </div>
             )}
 

@@ -5,6 +5,8 @@ import { supabase, User } from '@/lib/supabase';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface LeaderboardEntry extends User {
   solved_count: number;
@@ -58,7 +60,17 @@ export default function LeaderboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
         <div className="max-w-6xl mx-auto">
-          <p className="text-slate-400">Loading leaderboard...</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-slate-400">Loading leaderboard...</p>
+            <Link href="/dashboard">
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-200 hover:bg-slate-800"
+              >
+                ← Back to Dashboard
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -67,9 +79,19 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Leaderboard</h1>
-          <p className="text-slate-400">Top performers in the CTF competition</p>
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Leaderboard</h1>
+            <p className="text-slate-400">Top performers in the CTF competition</p>
+          </div>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="border-slate-600 text-slate-200 hover:bg-slate-800 whitespace-nowrap"
+            >
+              ← Back to Dashboard
+            </Button>
+          </Link>
         </div>
 
         <Card className="bg-slate-800 border-slate-700 overflow-hidden">

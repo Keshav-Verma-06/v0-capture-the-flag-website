@@ -1,0 +1,3 @@
+Simulated memory dump with various process data...
+Somewhere inside is the flag: flag{memory_extracted}
+Use strings/forensics tools to locate it.

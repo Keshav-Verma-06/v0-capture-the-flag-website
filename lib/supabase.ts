@@ -33,6 +33,24 @@ export type Challenge = {
   created_at: string;
 };
 
+export type Lab = {
+  id: string;
+  challenge_id: string;
+  slug: string;
+  lab_type: string;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type LabSession = {
+  id: string;
+  user_id: string;
+  lab_id: string;
+  started_at: string;
+  completed_at: string | null;
+  success: boolean;
+};
+
 export type Submission = {
   id: string;
   user_id: string;
