@@ -1,3 +1,5 @@
 Simulated memory dump with various process data...
-Somewhere inside is the flag: flag{memory_extracted}
-Use strings/forensics tools to locate it.
+Process ID: 1024 - buffer segment: flag{mem
+Process ID: 2048 - buffer segment: ory_extr
+Process ID: 3072 - buffer segment: acted}
+Other random process data continues...

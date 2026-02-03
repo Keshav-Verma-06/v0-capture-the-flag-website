@@ -205,12 +205,13 @@ This document lists the default seeded challenges in this CTF instance and their
 - **Points**: 50  
 - **Description**: Find the deleted flag from a disk image using forensic techniques.
 
-- **Flag**: `flag{file_recovered}`
+- **Flag**: `flag{your_hidden_flag}`
 
 - **Solution idea**:
-  - Mount or analyze the disk image with forensic tools (e.g., Autopsy, Sleuth Kit, FTK Imager).
-  - Check unallocated space, deleted file records (MFT on NTFS, inode tables on EXT), or file-system slack space.
-  - Recover deleted files and run `strings`/keyword search for `flag{` until you find the recovered flag.
+  - Use the `strings` command to extract readable text from the disk image.
+  - On Windows: `strings.exe 1mb.iso | findstr hidden`
+  - On Linux/Mac: `strings 1mb.iso | grep hidden`
+  - The flag contains the word "hidden" and can be found by filtering the strings output.
 
 ---
 

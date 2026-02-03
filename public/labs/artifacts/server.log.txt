@@ -1,0 +1,4 @@
+127.0.0.1 - - [02/Feb/2026:22:30:01] "GET /index.html HTTP/1.1" 200 -
+192.168.1.50 - - [02/Feb/2026:22:30:05] "GET /admin?user=admin' OR 1=1 -- HTTP/1.1" 200 -
+192.168.1.50 - - [02/Feb/2026:22:30:10] "GET /secret/data?token=ZmxhZ3ticmVhY2hfZGV0ZWN0ZWR9 HTTP/1.1" 200 -
+10.0.0.12 - - [02/Feb/2026:22:30:15] "GET /images/logo.png HTTP/1.1" 200 -

@@ -203,6 +203,14 @@ export default function LabPage() {
         return (
           <PacketLab onSolved={markLabCompleted} currentFlag={revealedFlag} status={status} />
         );
+      case 'log-file-investigation':
+        return (
+          <LogFileInvestigationLab onSolved={markLabCompleted} currentFlag={revealedFlag} status={status} />
+        );
+      case 'disk-image-recovery':
+        return (
+          <DiskImageRecoveryLab onSolved={markLabCompleted} currentFlag={revealedFlag} status={status} />
+        );
       default:
         return (
           <p className="text-slate-400">
@@ -1023,6 +1031,200 @@ function PacketLab({
         </div>
 
         {feedback && <p className="text-sm text-slate-200">{feedback}</p>}
+      </div>
+    </div>
+  );
+}
+
+function LogFileInvestigationLab({
+  onSolved,
+  currentFlag,
+  status,
+}: {
+  onSolved: (flag: string) => Promise<void>;
+  currentFlag: string | null;
+  status: LabStatus;
+}) {
+  const [answer, setAnswer] = useState('');
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [showHint, setShowHint] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!answer.trim()) return;
+    if (answer.trim() === 'flag{breach_detected}') {
+      setFeedback('Correct flag recovered from the server logs.');
+      if (status !== 'completed' && !currentFlag) {
+        await onSolved('flag{breach_detected}');
+      }
+    } else {
+      setFeedback('Incorrect flag. Analyze the log entries carefully, especially suspicious requests.');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold text-white">Lab: Log File Investigation</h2>
+        <p className="text-slate-400 text-sm">
+          Download the server log file and analyze it for evidence of a security breach. Look for
+          suspicious requests and extract the flag.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <a
+          href="/labs/artifacts/server.log.txt"
+          download
+          className="inline-flex items-center justify-center rounded-md bg-slate-800 border border-slate-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
+        >
+          Download Server Log
+        </a>
+        <p className="text-xs text-slate-400">
+          Analyze the log entries for suspicious activity. Look for SQL injection attempts, unusual
+          parameters, or encoded tokens in the requests.
+        </p>
+
+        <div className="space-y-2">
+          <label className="text-xs text-slate-300">Recovered flag</label>
+          <Input
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            className="bg-slate-800 border-slate-700 text-white font-mono"
+            placeholder="flag{...}"
+          />
+          <Button
+            onClick={handleSubmit}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white w-full md:w-auto"
+          >
+            Submit Flag
+          </Button>
+        </div>
+
+        {feedback && <p className="text-sm text-slate-200">{feedback}</p>}
+
+        <div className="border-t border-slate-700 pt-4">
+          <button
+            onClick={() => setShowHint(!showHint)}
+            className="text-blue-400 hover:text-blue-300 font-medium text-sm"
+          >
+            {showHint ? '▼ Hide' : '▶ Show'} Hint
+          </button>
+
+          {showHint && (
+            <div className="mt-4 bg-slate-700 rounded p-4 space-y-3">
+              <p className="text-slate-300 text-sm">
+                <strong>Hint:</strong> Look for suspicious requests in the log file, particularly those with unusual parameters or tokens.
+              </p>
+              <p className="text-slate-300 text-sm">
+                Some data in web requests may be encoded. Try using a <strong>base64 decoder</strong> to decode any encoded tokens or parameters you find in the log entries.
+              </p>
+              <p className="text-slate-300 text-sm">
+                Common tools for log analysis: grep, awk, sed, or online base64 decoders. Look for patterns that don't match normal web traffic.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DiskImageRecoveryLab({
+  onSolved,
+  currentFlag,
+  status,
+}: {
+  onSolved: (flag: string) => Promise<void>;
+  currentFlag: string | null;
+  status: LabStatus;
+}) {
+  const [answer, setAnswer] = useState('');
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [showHint, setShowHint] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!answer.trim()) return;
+    if (answer.trim() === 'flag{your_hidden_flag}') {
+      setFeedback('Correct flag recovered from the disk image.');
+      if (status !== 'completed' && !currentFlag) {
+        await onSolved('flag{your_hidden_flag}');
+      }
+    } else {
+      setFeedback('Incorrect flag. Try using the strings command to extract readable text from the ISO file, then search for flag patterns.');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold text-white">Lab: Disk Image Recovery</h2>
+        <p className="text-slate-400 text-sm">
+          A disk image from a compromised system has been recovered. The attacker attempted to delete sensitive information,
+          but traces may still remain. Use forensic techniques to recover the hidden flag from the disk image.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <a
+          href="/labs/artifacts/1mb.iso"
+          download
+          className="inline-flex items-center justify-center rounded-md bg-slate-800 border border-slate-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
+        >
+          Download Disk Image (1mb.iso)
+        </a>
+        <p className="text-xs text-slate-400">
+          Binary files like disk images often contain readable text strings embedded within them. Try using the <span className="font-mono">strings</span> command
+          (or <span className="font-mono">strings.exe</span> on Windows) to extract printable text from the ISO file. You can then search through the output
+          for flag-like patterns.
+        </p>
+
+        <div className="space-y-2">
+          <label className="text-xs text-slate-300">Recovered flag</label>
+          <Input
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            className="bg-slate-800 border-slate-700 text-white font-mono"
+            placeholder="flag{...}"
+          />
+          <Button
+            onClick={handleSubmit}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white w-full md:w-auto"
+          >
+            Submit Flag
+          </Button>
+        </div>
+
+        {feedback && <p className="text-sm text-slate-200">{feedback}</p>}
+
+        <div className="border-t border-slate-700 pt-4">
+          <button
+            onClick={() => setShowHint(!showHint)}
+            className="text-blue-400 hover:text-blue-300 font-medium text-sm"
+          >
+            {showHint ? '▼ Hide' : '▶ Show'} Hint
+          </button>
+
+          {showHint && (
+            <div className="mt-4 bg-slate-700 rounded p-4 space-y-3">
+              <p className="text-slate-300 text-sm">
+                <strong>Hint:</strong> The <span className="font-mono">strings</span> command extracts readable ASCII text from binary files.
+                This is perfect for finding text that's embedded in disk images or other binary formats.
+              </p>
+              <p className="text-slate-300 text-sm">
+                On Windows, you can use: <span className="font-mono">strings.exe 1mb.iso</span> to extract all readable strings.
+                On Linux/Mac, use: <span className="font-mono">strings 1mb.iso</span>
+              </p>
+              <p className="text-slate-300 text-sm">
+                Since the output might be long, you can pipe it through a filter. The flag contains the word "hidden" in it.
+                Try using <span className="font-mono">findstr</span> (Windows) or <span className="font-mono">grep</span> (Linux/Mac) to search for lines containing "hidden".
+              </p>
+              <p className="text-slate-300 text-sm">
+                <strong>Example:</strong> <span className="font-mono">strings.exe 1mb.iso | findstr hidden</span> (Windows) or
+                <span className="font-mono"> strings 1mb.iso | grep hidden</span> (Linux/Mac)
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

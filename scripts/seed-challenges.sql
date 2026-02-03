@@ -26,7 +26,7 @@ INSERT INTO challenges (title, category, difficulty, target_year, description, f
 VALUES 
   ('Memory Dump Analysis', 'Forensics', 'easy', '2025', 'Analyze a memory dump', 'A memory dump contains sensitive information. Find the flag hidden in it.', 'flag{memory_extracted}', 10),
   ('Log File Investigation', 'Forensics', 'medium', '2025', 'Investigate suspicious log entries', 'Analyze server logs to find evidence of a breach and the flag.', 'flag{breach_detected}', 25),
-  ('Disk Image Recovery', 'Forensics', 'hard', '2025', 'Recover data from a disk image', 'Find the deleted flag from a disk image using forensic techniques.', 'flag{file_recovered}', 50);
+  ('Disk Image Recovery', 'Forensics', 'hard', '2025', 'Recover data from a disk image', 'Find the deleted flag from a disk image using forensic techniques.', 'flag{your_hidden_flag}', 50);
 
 -- Miscellaneous challenges
 INSERT INTO challenges (title, category, difficulty, target_year, description, full_description, flag_hash, points)
@@ -85,6 +85,14 @@ ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO labs (challenge_id, slug, lab_type, is_active)
 SELECT id, 'packet-analysis', 'networking', true FROM challenges WHERE title = 'Packet Analysis'
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
+SELECT id, 'log-file-investigation', 'forensics', true FROM challenges WHERE title = 'Log File Investigation'
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO labs (challenge_id, slug, lab_type, is_active)
+SELECT id, 'disk-image-recovery', 'forensics', true FROM challenges WHERE title = 'Disk Image Recovery'
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO labs (challenge_id, slug, lab_type, is_active)
