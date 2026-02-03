@@ -89,12 +89,12 @@ export default function SteganographyLab() {
             <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-8 mb-6 text-center">
               <div className="mb-6">
                 <img
-                  src="/challenges/steganography/secret_image.jpeg"
+                  src="/challenges/steganography/secret_image.png"
                   alt="Challenge image containing hidden flag"
                   className="w-full max-w-md mx-auto rounded-lg border border-slate-600"
                 />
               </div>
-              <a href="/challenges/steganography/secret_image.jpeg" download="secret_image.jpeg">
+              <a href="/challenges/steganography/secret_image.png" download="secret_image.png">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
                   <Download className="h-4 w-4" />
                   Download Image
