@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase, Challenge, Lab } from '@/lib/supabase';
 import { Card } from '@/components/ui/card';
@@ -17,7 +17,7 @@ type SqlInjResponse = {
   debugQuery: string;
 };
 
-export default function LabPage() {
+function LabPageContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1227,5 +1227,19 @@ function DiskImageRecoveryLab({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LabPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LabPageContent />
+    </Suspense>
   );
 }

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function SocialMediaProfilingLab() {
+function SocialMediaProfilingLabContent() {
   const searchParams = useSearchParams();
   const challengeId = searchParams.get('challengeId');
   const backHref = challengeId ? `/challenges/${challengeId}` : '/challenges';
@@ -280,5 +280,19 @@ export default function SocialMediaProfilingLab() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SocialMediaProfilingLab() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SocialMediaProfilingLabContent />
+    </Suspense>
   );
 }

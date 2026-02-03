@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -28,7 +28,7 @@ function HintItem({ title, children }: { title: string; children: React.ReactNod
     )
 }
 
-export default function PasswordCrackingLab() {
+function PasswordCrackingLabContent() {
     const searchParams = useSearchParams()
     const challengeId = searchParams.get('challengeId')
     const backHref = challengeId ? `/challenges/${challengeId}` : "/challenges"

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function EmailHarvestingLab() {
+function EmailHarvestingLabContent() {
   const searchParams = useSearchParams();
   const challengeId = searchParams.get('challengeId');
   const backHref = challengeId ? `/challenges/${challengeId}` : '/challenges';
@@ -191,5 +191,19 @@ export default function EmailHarvestingLab() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function EmailHarvestingLab() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <EmailHarvestingLabContent />
+    </Suspense>
   );
 }
