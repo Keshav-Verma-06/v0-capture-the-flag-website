@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
 function WhoisLookupLabContent() {
   const searchParams = useSearchParams();
@@ -107,30 +108,41 @@ Secret Flag: flag{whois_info_found}
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center gap-3">
           <Link href={backHref}>
-            <Button variant="outline" className="mb-4 border-slate-600 text-slate-200 hover:bg-slate-800">
+            <Button variant="outline" className="border-slate-600 text-slate-200 hover:bg-slate-800">
               ← {backText}
             </Button>
           </Link>
-          <h1 className="text-4xl font-bold mb-2">Whois Lookup Lab</h1>
-          <p className="text-slate-300">
-            Learn how to gather public information about domains using WHOIS
-          </p>
+          
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card className="bg-slate-800 border-slate-700 p-6">
-              <h2 className="text-xl font-semibold mb-4 text-purple-400">
-                WHOIS Lookup
-              </h2>
+        <Card className="bg-slate-800 border-slate-700 shadow-lg">
+          <div className="p-8 space-y-4">
+            <div className="flex items-center gap-3">
+              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                🔍 OSINT / Recon
+              </Badge>
+              <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                Easy
+              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                10 pts
+              </Badge>
+            </div>
+
+            <h1 className="text-4xl font-bold text-white">WHOIS Decoder</h1>
+            <p className="text-slate-400">
+               Learn how to gather public information about domains using WHOIS
+            </p>
+            <div className="bg-slate-900/50 border border-slate-700 rounded p-4">
+              <h2 className="text-lg font-semibold text-blue-300 mb-2">WHOIS Lookup</h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Domain Name
                   </label>
                   <Input
@@ -141,21 +153,21 @@ Secret Flag: flag{whois_info_found}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') handleLookup();
                     }}
-                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
                   />
                 </div>
 
                 <div className="flex gap-2">
                   <Button
                     onClick={handleLookup}
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                   >
-                    Perform Lookup
+                    🔓 Decrypt & Lookup
                   </Button>
                   <Button
                     onClick={handleReset}
                     variant="outline"
-                    className="border-slate-600 hover:bg-slate-700 bg-transparent"
+                    className="border-slate-600 hover:bg-slate-700 bg-transparent text-slate-200"
                   >
                     Reset
                   </Button>
@@ -163,67 +175,58 @@ Secret Flag: flag{whois_info_found}
 
                 {attempts > 0 && (
                   <div className="text-sm text-slate-400">
-                    Attempts: {attempts}
+                    Decryption Attempts: {attempts}
                   </div>
                 )}
               </div>
 
               {result && (
-                <div className="mt-6 p-4 bg-slate-700 rounded border border-slate-600">
-                  <pre className="text-sm text-slate-200 overflow-x-auto whitespace-pre-wrap break-words">
+                <div className="mt-6 p-4 bg-slate-900/70 rounded border border-slate-700">
+                  <p className="text-xs text-blue-300 mb-2 font-mono">--- DECRYPTED WHOIS DATA ---</p>
+                  <pre className="text-sm text-slate-200 overflow-x-auto whitespace-pre-wrap break-words font-mono">
                     {result}
                   </pre>
+                  <p className="text-xs text-blue-300 mt-2 font-mono">--- END DATA ---</p>
                 </div>
               )}
 
               {flagFound && (
-                <div className="mt-6 p-4 bg-green-900 border border-green-600 rounded">
-                  <p className="text-green-100 font-semibold">
-                    ✓ Flag Found! Extract the flag from the WHOIS information
-                    above.
+                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded">
+                  <p className="text-green-300 font-semibold">
+                    ✓ Cipher Cracked! Extract the flag from the decrypted WHOIS above.
                   </p>
                 </div>
               )}
-            </Card>
+            </div>
           </div>
+        </Card>
 
-          <div className="lg:col-span-1">
-            <Card className="bg-slate-800 border-slate-700 p-6 sticky top-6">
-              <h3 className="text-lg font-semibold mb-4 text-blue-400">
-                Hints & Tips
-              </h3>
-              <ul className="space-y-3 text-sm text-slate-300">
-                <li>
-                  <strong>What is WHOIS?</strong> WHOIS is a database that
-                  contains information about domain registrations.
-                </li>
-                <li>
-                  <strong>Public Information:</strong> Domain registration
-                  details are publicly available unless privacy protection is
-                  enabled.
-                </li>
-                <li>
-                  <strong>Key Data:</strong> Look for admin contact, technical
-                  contact, name servers, and registration dates.
-                </li>
-                <li>
-                  <strong>Try these domains:</strong> example.com, ctf-event.com,
-                  vulnerable.io
-                </li>
-                <li>
-                  <strong>Real-world use:</strong> Security researchers use
-                  WHOIS to find contact information and infrastructure details.
-                </li>
-              </ul>
+        <Card className="bg-slate-800 border-slate-700 shadow-lg">
+          <div className="p-6 space-y-4">
+            <h3 className="text-lg font-semibold text-blue-300">📜 Caesar Cipher Hints</h3>
+            <ul className="space-y-3 text-sm text-slate-300">
+              <li>
+                <strong className="text-blue-300">What is WHOIS?</strong> Public registry data for domains.
+              </li>
+              <li>
+                <strong className="text-blue-300">Public Information:</strong> Registration details unless privacy is enabled.
+              </li>
+              <li>
+                <strong className="text-blue-300">Key Data:</strong> Admin contacts, name servers, and dates.
+              </li>
+              <li>
+                <strong className="text-blue-300">Cipher Angle:</strong> Think of WHOIS fields as encoded clues.
+              </li>
+            </ul>
 
-              <div className="mt-6 p-3 bg-purple-900 rounded border border-purple-600">
-                <p className="text-xs text-purple-200">
-                  <strong>Lab Difficulty:</strong> Easy (10 points)
-                </p>
-              </div>
-            </Card>
+
+            <div className="p-3 bg-blue-500/10 rounded border border-blue-500/30">
+              <p className="text-xs text-blue-200">
+                <strong>Lab Difficulty:</strong> Easy (10 points)
+              </p>
+            </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

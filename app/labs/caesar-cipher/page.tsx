@@ -1,83 +1,114 @@
-'use client';
+"use client";
 
-import React, { useState, Suspense } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-function CaesarCipherLabContent() {
-  const searchParams = useSearchParams();
-  const challengeId = searchParams.get('challengeId');
-  const backHref = challengeId ? `/challenges/${challengeId}` : '/challenges';
-  const backText = challengeId ? 'Back to Challenge' : 'Back to Challenges';
-  const [answer, setAnswer] = useState('');
-  const [showFlag, setShowFlag] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+export default function CaesarCipherLab() {
+  const [answer, setAnswer] = useState("");
+  const [flag, setFlag] = useState<string | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
 
-  const FLAG = 'flag{caesar_shift3}';
-  const ENCRYPTED_TEXT = 'Wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj';
-  const DECRYPTED_TEXT = 'The quick brown fox jumps over the lazy dog';
+  const ENCRYPTED_TEXT = "Wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!answer.trim()) return;
 
     setSubmitting(true);
     setMessage(null);
+    setFlag(null);
 
-    setTimeout(() => {
-      if (answer.trim().toLowerCase() === DECRYPTED_TEXT.toLowerCase()) {
+    try {
+      const res = await fetch("/api/labs/caesar-cipher/verify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ answer }),
+      });
+
+      const data = (await res.json().catch(() => null)) as {
+        correct?: boolean;
+        message?: string;
+        flag?: string;
+      } | null;
+
+      if (!res.ok || !data) {
         setMessage({
-          type: 'success',
-          text: '✓ Correct! You decrypted the Caesar cipher!',
+          type: "error",
+          text: data?.message ?? "Something went wrong. Try again.",
         });
-        setShowFlag(true);
+        return;
+      }
+
+      if (data.correct) {
+        setMessage({ type: "success", text: data.message ?? "✓ Correct!" });
+        setFlag(data.flag ?? null);
       } else {
         setMessage({
-          type: 'error',
-          text: '✗ Incorrect. Try decrypting the text with different shift values.',
+          type: "error",
+          text: data.message ?? "✗ Incorrect. Try a different shift.",
         });
-        setShowFlag(false);
       }
+    } catch {
+      setMessage({ type: "error", text: "Network error. Please try again." });
+    } finally {
       setSubmitting(false);
-    }, 500);
-  };
-
-  const generateShiftOptions = () => {
-    const shifts = [];
-    for (let i = 1; i <= 25; i++) {
-      let shifted = '';
-      for (let char of ENCRYPTED_TEXT) {
-        if (char.match(/[a-z]/i)) {
-          const code = char.charCodeAt(0);
-          const base = code >= 97 ? 97 : 65;
-          shifted += String.fromCharCode(((code - base - i + 26) % 26) + base);
-        } else {
-          shifted += char;
-        }
-      }
-      shifts.push({ shift: i, text: shifted });
     }
-    return shifts;
   };
 
-  const shifts = generateShiftOptions();
+  useEffect(() => {
+    const loadChallengeId = async () => {
+      const { data } = await supabase
+        .from("challenges")
+        .select("id")
+        .eq("title", "Caesar Cipher")
+        .maybeSingle();
+
+      setChallengeId(data?.id ?? null);
+    };
+
+    loadChallengeId();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <Link href={backHref}>
-            <Button variant="outline" className="border-slate-600 text-slate-200 hover:bg-slate-800">
-              ← {backText}
-            </Button>
+          <Link
+            href="/challenges"
+            className="text-blue-400 hover:text-blue-300"
+          >
+            ← Back to Challenges
           </Link>
         </div>
+
+        <Card className="bg-slate-900/60 border border-slate-700 mb-6">
+          <div className="p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="space-y-1">
+              <p className="text-white font-semibold">Problem page</p>
+              <p className="text-slate-400 text-xs md:text-sm">
+                Open the challenge to see full description and submit the flag.
+              </p>
+            </div>
+            <Link
+              href={challengeId ? `/challenges/${challengeId}` : "/challenges"}
+            >
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Open Problem
+              </Button>
+            </Link>
+          </div>
+        </Card>
 
         <Card className="bg-slate-800 border-slate-700 mb-6">
           <div className="p-8">
@@ -87,21 +118,31 @@ function CaesarCipherLabContent() {
               </Badge>
             </div>
 
-            <h1 className="text-4xl font-bold text-white mb-2">Caesar Cipher</h1>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Caesar Cipher
+            </h1>
             <p className="text-slate-400 mb-6">
-              Decrypt this message encrypted with a Caesar cipher.
+              Decrypt this message encrypted with a Caesar cipher. The shift is
+              between 1 and 15.
             </p>
 
             <div className="bg-slate-900/50 border border-slate-700 rounded p-4 mb-6">
-              <h3 className="text-sm font-mono text-green-400 mb-2">Encrypted Text:</h3>
-              <p className="text-sm font-mono text-slate-300 break-all">{ENCRYPTED_TEXT}</p>
+              <h3 className="text-sm font-mono text-green-400 mb-2">
+                Encrypted Text:
+              </h3>
+              <p className="text-sm font-mono text-slate-300 break-all">
+                {ENCRYPTED_TEXT}
+              </p>
             </div>
 
             <p className="text-slate-400 mb-4">
-              The Caesar cipher is a simple substitution cipher where each letter is shifted by a fixed number of positions in the alphabet.
+              The Caesar cipher is a simple substitution cipher where each
+              letter is shifted by a fixed number of positions in the alphabet.
             </p>
 
-            <h2 className="text-lg font-semibold text-white mb-4">Decrypt the message:</h2>
+            <h2 className="text-lg font-semibold text-white mb-4">
+              Decrypt the message:
+            </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4 mb-8">
               <div>
@@ -121,16 +162,16 @@ function CaesarCipherLabContent() {
               {message && (
                 <div
                   className={`p-4 rounded-md border ${
-                    message.type === 'success'
-                      ? 'bg-green-500/10 border-green-500/20'
-                      : 'bg-red-500/10 border-red-500/20'
+                    message.type === "success"
+                      ? "bg-green-500/10 border-green-500/20"
+                      : "bg-red-500/10 border-red-500/20"
                   }`}
                 >
                   <p
                     className={
-                      message.type === 'success'
-                        ? 'text-green-400'
-                        : 'text-red-400'
+                      message.type === "success"
+                        ? "text-green-400"
+                        : "text-red-400"
                     }
                   >
                     {message.text}
@@ -143,69 +184,87 @@ function CaesarCipherLabContent() {
                 disabled={submitting}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2"
               >
-                {submitting ? 'Checking...' : 'Submit Answer'}
+                {submitting ? "Checking..." : "Submit Answer"}
               </Button>
             </form>
 
             <div className="border-t border-slate-700 pt-6">
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={() => setShowHint(!showHint)}
-                className="text-blue-400 hover:text-blue-300 font-medium"
+                className="text-blue-400 hover:text-blue-300 font-medium px-0"
               >
-                {showHint ? '▼ Hide' : '▶ Show'} Caesar Shift Reference
-              </button>
+                {showHint ? "▼ Hide" : "▶ Show"} Hints
+              </Button>
 
               {showHint && (
-                <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
-                  <p className="text-slate-400 text-sm mb-3">
-                    Try each shift value to find the correct decryption:
+                <div className="mt-4 space-y-3">
+                  <p className="text-slate-300 text-sm">
+                    Use a third-party Caesar cipher decoder to try shift values
+                    1–15. Paste the encrypted text, then copy the plaintext
+                    result into the answer box.
                   </p>
-                  <div className="space-y-2">
-                    {shifts.map((s) => (
-                      <div key={s.shift} className="bg-slate-700 rounded p-2 text-xs">
-                        <span className="text-slate-400">Shift {s.shift}:</span>
-                        <span className="text-slate-300 ml-2 font-mono break-all">{s.text}</span>
-                      </div>
-                    ))}
-                  </div>
+
+                  <p className="text-sm text-slate-400">
+                    Suggested tools:{" "}
+                    <a
+                      href="https://www.dcode.fr/caesar-cipher"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      dCode
+                    </a>{" "}
+                    or{" "}
+                    <a
+                      href="https://cryptii.com/pipes/caesar-cipher"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      Cryptii
+                    </a>
+                    .
+                  </p>
+
+                  <ul className="list-disc list-inside text-sm text-slate-400 space-y-1">
+                    <li>Keep spaces/punctuation the same</li>
+                    <li>Only A–Z / a–z letters are shifted</li>
+                    <li>
+                      When it becomes readable English, you found the right
+                      shift
+                    </li>
+                  </ul>
                 </div>
               )}
             </div>
           </div>
         </Card>
 
-        {showFlag && (
+        {flag && (
           <Card className="bg-green-500/10 border-green-500/20">
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-green-400 mb-4">🎉 Decryption Successful!</h2>
+              <h2 className="text-2xl font-bold text-green-400 mb-4">
+                🎉 Decryption Successful!
+              </h2>
               <p className="text-slate-300 mb-4">
                 You successfully decrypted the Caesar cipher!
               </p>
               <div className="bg-slate-900/50 border border-green-500/30 rounded p-4 mb-6">
                 <p className="text-sm text-slate-400 mb-2">Flag:</p>
-                <p className="font-mono text-green-400 text-lg break-all">{FLAG}</p>
+                <p className="font-mono text-green-400 text-lg break-all">
+                  {flag}
+                </p>
               </div>
               <p className="text-sm text-slate-400">
-                Copy the flag above and submit it in the challenge page to earn points!
+                Copy the flag above and submit it in the challenge page to earn
+                points!
               </p>
             </div>
           </Card>
         )}
       </div>
     </div>
-  );
-}
-
-export default function CaesarCipherLab() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-slate-400">Loading...</p>
-        </div>
-      </div>
-    }>
-      <CaesarCipherLabContent />
-    </Suspense>
   );
 }

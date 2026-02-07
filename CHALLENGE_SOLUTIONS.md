@@ -9,9 +9,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ## Web Security
 
 ### 1. SQL Injection 101
-- **Category**: Web Security  
-- **Difficulty**: easy  
-- **Points**: 10  
+
+- **Category**: Web Security
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: A simple login form with SQL injection. Try entering a simple payload to bypass authentication.
 
 - **Flag**: `flag{sql_inj3ct1on}`
@@ -26,9 +27,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 2. XSS Vulnerability
-- **Category**: Web Security  
-- **Difficulty**: medium  
-- **Points**: 25  
+
+- **Category**: Web Security
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: A web application is vulnerable to cross-site scripting. Find a way to execute arbitrary JavaScript code.
 
 - **Flag**: `flag{xss_payload_success}`
@@ -44,16 +46,17 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 3. CSRF Attack
-- **Category**: Web Security  
-- **Difficulty**: hard  
-- **Points**: 50  
+
+- **Category**: Web Security
+- **Difficulty**: hard
+- **Points**: 50
 - **Description**: Exploit CSRF vulnerability to perform unauthorized actions on behalf of a user.
 
 - **Flag**: `flag{csrf_protected}`
 
 - **Solution idea**:
   - Find a state-changing endpoint (e.g., change email, change password, transfer points) that:
-    - Uses only cookies for auth, and  
+    - Uses only cookies for auth, and
     - Lacks CSRF protections (no CSRF token, no SameSite protection assumptions, etc.).
   - Craft an HTML form or request that triggers this action and host it on an external site:
     \`\`\`html
@@ -69,15 +72,16 @@ This document lists the default seeded challenges in this CTF instance and their
 ## Cryptography
 
 ### 4. Caesar Cipher
-- **Category**: Cryptography  
-- **Difficulty**: easy  
-- **Points**: 10  
+
+- **Category**: Cryptography
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: A message encrypted with a Caesar cipher with shift 3. Decrypt it to find the flag.
 
 - **Flag**: `flag{caesar_shift3}`
 
 - **Solution idea**:
-  - A Caesar cipher with shift 3 means each letter has been shifted by 3 positions (commonly to the right):  
+  - A Caesar cipher with shift 3 means each letter has been shifted by 3 positions (commonly to the right):
     - Example: `A → D`, `B → E`, etc.
   - To decrypt, shift all alphabetic characters 3 positions back:
     - `D → A`, `E → B`, etc.
@@ -86,9 +90,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 5. RSA Encryption
-- **Category**: Cryptography  
-- **Difficulty**: medium  
-- **Points**: 25  
+
+- **Category**: Cryptography
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: You have the public key and ciphertext. Find the plaintext.
 
 - **Flag**: `flag{rsa_broken}`
@@ -101,27 +106,29 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
-### 6. Hash Collision
-- **Category**: Cryptography  
-- **Difficulty**: hard  
-- **Points**: 50  
-- **Description**: Find two different inputs that produce the same MD5 hash.
+### 6. XOR Repeating Key
 
-- **Flag**: `flag{hash_collision_found}`
+- **Category**: Cryptography
+- **Difficulty**: hard
+- **Points**: 50
+- **Description**: Break a repeating-key XOR cipher.
+
+- **Flag**: `flag{xor_repeating_key_cracked}`
 
 - **Solution idea**:
-  - MD5 is broken and practical collision attacks exist.
-  - Use known tools or published collision-generating code (e.g., `hashclash`, prebuilt MD5 collision generators) to generate two different files/strings that hash to the same MD5.
-  - Provide both colliding inputs as proof; the system/description then reveals the flag.
+  - Estimate the key length using repeating patterns or index of coincidence.
+  - Group ciphertext bytes by key positions and apply frequency analysis to recover the key characters.
+  - Once the key is known, decrypt the message and submit the plaintext flag string.
 
 ---
 
 ## Reverse Engineering
 
 ### 7. Simple Binary
-- **Category**: Reverse Engineering  
-- **Difficulty**: easy  
-- **Points**: 10  
+
+- **Category**: Reverse Engineering
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: Use a disassembler to understand what the binary does and find the flag.
 
 - **Flag**: `flag{binary_analyzed}`
@@ -134,9 +141,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 8. Obfuscated Code
-- **Category**: Reverse Engineering  
-- **Difficulty**: medium  
-- **Points**: 25  
+
+- **Category**: Reverse Engineering
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: The code is obfuscated. Deobfuscate it to find the hidden flag.
 
 - **Flag**: `flag{deobfuscated_code}`
@@ -151,9 +159,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 9. Anti-Debug Technique
-- **Category**: Reverse Engineering  
-- **Difficulty**: hard  
-- **Points**: 50  
+
+- **Category**: Reverse Engineering
+- **Difficulty**: hard
+- **Points**: 50
 - **Description**: The binary has anti-debug protections. Bypass them to extract the flag.
 
 - **Flag**: `flag{debugger_bypass}`
@@ -170,9 +179,10 @@ This document lists the default seeded challenges in this CTF instance and their
 ## Forensics
 
 ### 10. Memory Dump Analysis
-- **Category**: Forensics  
-- **Difficulty**: easy  
-- **Points**: 10  
+
+- **Category**: Forensics
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: A memory dump contains sensitive information. Find the flag hidden in it.
 
 - **Flag**: `flag{memory_extracted}`
@@ -185,24 +195,26 @@ This document lists the default seeded challenges in this CTF instance and their
 ---
 
 ### 11. Log File Investigation
-- **Category**: Forensics  
-- **Difficulty**: medium  
-- **Points**: 25  
+
+- **Category**: Forensics
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: Analyze server logs to find evidence of a breach and the flag.
 
 - **Flag**: `flag{breach_detected}`
 
 - **Solution idea**:
   - Examine access and error logs for anomalies: suspicious IP addresses, strange user agents, unusual parameters, or high error rates.
-  - Follow the attacker’s trail (e.g., exploitation of a vulnerable endpoint, LFI/RFI, or path traversal) and look for lines where the application prints or leaks sensitive data.
+  - Follow the attacker's trail (e.g., exploitation of a vulnerable endpoint, LFI/RFI, or path traversal) and look for lines where the application prints or leaks sensitive data.
   - The flag is typically embedded in one of these malicious requests or in the resulting error/response log line.
 
 ---
 
 ### 12. Disk Image Recovery
-- **Category**: Forensics  
-- **Difficulty**: hard  
-- **Points**: 50  
+
+- **Category**: Forensics
+- **Difficulty**: hard
+- **Points**: 50
 - **Description**: Find the deleted flag from a disk image using forensic techniques.
 
 - **Flag**: `flag{your_hidden_flag}`
@@ -215,12 +227,83 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
+## OSINT
+
+### 13. Landmark + Timeline Correlation
+
+- **Category**: OSINT
+- **Difficulty**: medium
+- **Points**: 25
+- **Description**: Correlate a landmark opening date and key engineer using public records.
+
+- **Flag**: `flag{monday_gustave_eiffel}`
+
+- **Solution idea**:
+  - Search reputable historical archives or the official site for the Eiffel Tower to confirm the public opening date (May 6, 1889).
+  - Use a perpetual calendar calculator or historical newspaper archive to determine the weekday (Monday) for that date.
+  - Verify the chief engineer by consulting biographical records on the tower's construction team (Gustave Eiffel headed the project).
+  - Combine the weekday and engineer's name to form the flag.
+
+---
+
+### 14. Corporate Footprint Reconstruction
+
+- **Category**: OSINT
+- **Difficulty**: medium
+- **Points**: 25
+- **Description**: Reconstruct a company's registered office address from public records.
+
+- **Flag**: `flag{1_rocket_road_hawthorne_ca}`
+
+- **Solution idea**:
+  - Review SEC filings, launch press releases, or California business registry entries from 2010 to confirm SpaceX's listed headquarters.
+  - Cross-reference with archived news articles about the first Falcon 9 launch to validate the location.
+  - Note the complete street address (1 Rocket Road, Hawthorne, CA 90250) used in official documents.
+  - Normalize the address components and combine them to obtain the flag value.
+
+---
+
+### 15. Aviation + Open Registries
+
+- **Category**: OSINT
+- **Difficulty**: medium
+- **Points**: 25
+- **Description**: Correlate flight tracker logs with registry data to identify an aircraft.
+
+- **Flag**: `flag{n212ua_1995}`
+
+- **Solution idea**:
+  - Review flight-tracking archives covering the 2023 emergency diversion to capture the airline, flight number, and aircraft registration.
+  - Confirm the registration using FAA or ICAO aircraft registries as well as planespotter databases.
+  - Cross-check airframe histories or delivery records to extract the original manufacture year.
+  - Combine the tail number (e.g., N212UA) and the manufacture year (1995) in the required flag format.
+
+---
+
+### 16. Organizational Change Tracking
+
+- **Category**: OSINT
+- **Difficulty**: hard
+- **Points**: 50
+- **Description**: Track leadership renewals at a global health body.
+
+- **Flag**: `flag{may_2022}`
+
+- **Solution idea**:
+  - Search the WHO newsroom archive for press releases surrounding the 75th World Health Assembly during the COVID period.
+  - Confirm the formal vote that renewed Tedros Adhanom Ghebreyesus for a second term and note when the result was announced.
+  - Cross-check with archived Executive Board documents and independent coverage to validate the same month and year.
+  - Combine the month (May) and year (2022) in the prescribed flag format.
+
+---
+
 ## Miscellaneous
 
-### 13. Steganography
-- **Category**: Miscellaneous  
-- **Difficulty**: easy  
-- **Points**: 10  
+### 17. Steganography
+
+- **Category**: Miscellaneous
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: An image contains a hidden message. Extract it to find the flag.
 
 - **Flag**: `flag{stego_found}`
@@ -234,10 +317,11 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
-### 14. Password Cracking
-- **Category**: Miscellaneous  
-- **Difficulty**: medium  
-- **Points**: 25  
+### 18. Password Cracking
+
+- **Category**: Miscellaneous
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: You have a hashed password. Crack it using a dictionary attack.
 
 - **Flag**: `flag{password_cracked}`
@@ -249,10 +333,11 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
-### 15. Social Engineering
-- **Category**: Miscellaneous  
-- **Difficulty**: hard  
-- **Points**: 50  
+### 19. Social Engineering
+
+- **Category**: Miscellaneous
+- **Difficulty**: hard
+- **Points**: 50
 - **Description**: Use social engineering techniques to extract sensitive information.
 
 - **Flag**: `flag{soceng_success}`
@@ -266,10 +351,11 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ## Networking
 
-### 16. Packet Analysis
-- **Category**: Networking  
-- **Difficulty**: easy  
-- **Points**: 10  
+### 20. Packet Analysis
+
+- **Category**: Networking
+- **Difficulty**: easy
+- **Points**: 10
 - **Description**: Examine a PCAP file to find the flag transmitted over the network.
 
 - **Flag**: `flag{packet_found}`
@@ -281,10 +367,11 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
-### 17. DNS Enumeration
-- **Category**: Networking  
-- **Difficulty**: medium  
-- **Points**: 25  
+### 21. DNS Enumeration
+
+- **Category**: Networking
+- **Difficulty**: medium
+- **Points**: 25
 - **Description**: Find subdomains by enumerating DNS records to locate the flag.
 
 - **Flag**: `flag{dns_enumerated}`
@@ -296,10 +383,11 @@ This document lists the default seeded challenges in this CTF instance and their
 
 ---
 
-### 18. Man-in-the-Middle Attack
-- **Category**: Networking  
-- **Difficulty**: hard  
-- **Points**: 50  
+### 22. Man-in-the-Middle Attack
+
+- **Category**: Networking
+- **Difficulty**: hard
+- **Points**: 50
 - **Description**: Intercept encrypted traffic using MITM techniques to find the flag.
 
 - **Flag**: `flag{mitm_success}`
