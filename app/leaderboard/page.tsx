@@ -11,6 +11,7 @@ import Link from 'next/link';
 interface LeaderboardEntry extends User {
   solved_count: number;
   calculated_score: number;
+  solved_challenges: number[];
 }
 
 interface TeamLeaderboardEntry {
@@ -52,8 +53,8 @@ export default function LeaderboardPage() {
           
           // Calculate total points from solved challenges (same as dashboard)
           let totalPoints = 0;
-          if (solvesData && solvesData.length > 0) {
-            const challengeIds = solvesData.map((s) => s.challenge_id);
+          const challengeIds: number[] = solvesData?.map((s) => s.challenge_id) || [];
+          if (challengeIds.length > 0) {
             const { data: challengesData } = await supabase
               .from('challenges')
               .select('points')
@@ -66,6 +67,7 @@ export default function LeaderboardPage() {
             ...user,
             solved_count: solvedCount,
             calculated_score: totalPoints,
+            solved_challenges: challengeIds,
           };
         })
       );
@@ -76,10 +78,10 @@ export default function LeaderboardPage() {
       setLeaderboard(leaderboardData);
 
       // Calculate team leaderboard
+      // Build per-team sets of unique solved challenge IDs and member lists
       const teamMap = new Map<string, {
-        total_score: number;
-        total_solves: number;
         members: string[];
+        challengeIds: Set<number>;
       }>();
 
       leaderboardData.forEach((user) => {
@@ -87,28 +89,41 @@ export default function LeaderboardPage() {
           const teamName = user.team_name;
           if (!teamMap.has(teamName)) {
             teamMap.set(teamName, {
-              total_score: 0,
-              total_solves: 0,
               members: [],
+              challengeIds: new Set<number>(),
             });
           }
           const team = teamMap.get(teamName)!;
-          team.total_score += user.calculated_score ?? 0;
-          team.total_solves += user.solved_count ?? 0;
           team.members.push(user.username);
+          (user.solved_challenges || []).forEach((id: number) => team.challengeIds.add(id));
         }
       });
 
-      // Convert map to array and sort by total_score
-      const teamLeaderboardData: TeamLeaderboardEntry[] = Array.from(teamMap.entries())
-        .map(([team_name, data]) => ({
+      // For each team, fetch unique challenge points and compute totals
+      const teamLeaderboardData: TeamLeaderboardEntry[] = [];
+      for (const [team_name, data] of Array.from(teamMap.entries())) {
+        const uniqueIds = Array.from(data.challengeIds);
+        let totalScore = 0;
+        if (uniqueIds.length > 0) {
+          const { data: challengesData } = await supabase
+            .from('challenges')
+            .select('id, points')
+            .in('id', uniqueIds);
+
+          totalScore = challengesData?.reduce((sum, c) => sum + (c.points || 0), 0) || 0;
+        }
+
+        teamLeaderboardData.push({
           team_name,
-          total_score: data.total_score,
-          total_solves: data.total_solves,
+          total_score: totalScore,
+          total_solves: uniqueIds.length,
           member_count: data.members.length,
           members: data.members,
-        }))
-        .sort((a, b) => b.total_score - a.total_score);
+        });
+      }
+
+      // Sort teams by total_score desc
+      teamLeaderboardData.sort((a, b) => b.total_score - a.total_score);
 
       setTeamLeaderboard(teamLeaderboardData);
     } catch (error) {
