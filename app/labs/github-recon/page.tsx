@@ -96,11 +96,11 @@ function LandmarkTimelineLabContent() {
             <ul className="space-y-2 text-sm text-slate-300">
               <li>
                 • Confirm the public opening date for the Eiffel Tower in 1889.
-                <li>
-                  • The 1889 Exposition Universelle guidebooks and
-                  contemporaneous newspapers document the tower's phased
-                  opening.
-                </li>
+              </li>
+              <li>
+                • The 1889 Exposition Universelle guidebooks and
+                contemporaneous newspapers document the tower's phased
+                opening.
               </li>
               <li>• Cross-reference at least two independent open sources.</li>
             </ul>

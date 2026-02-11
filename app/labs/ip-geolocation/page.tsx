@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const TARGET_TAIL = "N212UA";
-const TARGET_YEAR = "1995";
+const TARGET_YEARS = ["1995", "2000"];
 const FLAG_VALUE = "flag{n212ua_1995}";
 
 type MessageState = { type: "success" | "error"; text: string } | null;
@@ -70,7 +70,7 @@ function AviationRegistriesLabContent() {
     }
 
     const tailMatches = normalizedTail === TARGET_TAIL;
-    const yearMatches = normalizedYear === TARGET_YEAR;
+    const yearMatches = TARGET_YEARS.includes(normalizedYear);
 
     if (tailMatches && yearMatches) {
       setMessage({
