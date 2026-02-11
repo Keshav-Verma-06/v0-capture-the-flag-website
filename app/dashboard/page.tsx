@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [solvedCount, setSolvedCount] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [teamScore, setTeamScore] = useState<number | null>(null);
   const [recentSolves, setRecentSolves] = useState<
     Array<{
       id: string;
@@ -72,6 +73,46 @@ export default function DashboardPage() {
 
         const total = challengesData?.reduce((sum, c) => sum + (c.points || 0), 0) || 0;
         setTotalPoints(total);
+      }
+
+      // If user has a team, compute team score using unique challenge IDs across members
+      if (userData.team_name) {
+        try {
+          const { data: teamMembers } = await supabase
+            .from('users')
+            .select('id, username')
+            .eq('team_name', userData.team_name);
+
+          const memberIds = (teamMembers || []).map((m: any) => m.id);
+
+          if (memberIds.length > 0) {
+            const { data: teamSolves } = await supabase
+              .from('solves')
+              .select('challenge_id')
+              .in('user_id', memberIds);
+
+            const uniqueIds = Array.from(new Set((teamSolves || []).map((s: any) => s.challenge_id)));
+
+            if (uniqueIds.length > 0) {
+              const { data: teamChallenges } = await supabase
+                .from('challenges')
+                .select('id, points')
+                .in('id', uniqueIds);
+
+              const teamTotal = teamChallenges?.reduce((sum, c) => sum + (c.points || 0), 0) || 0;
+              setTeamScore(teamTotal);
+            } else {
+              setTeamScore(0);
+            }
+          } else {
+            setTeamScore(0);
+          }
+        } catch (err) {
+          console.error('Error computing team score:', err);
+          setTeamScore(null);
+        }
+      } else {
+        setTeamScore(null);
       }
 
       // Fetch recent solves with challenge details
@@ -141,7 +182,30 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-slate-800 border-slate-700 p-6">
             <div className="text-slate-400 text-sm font-medium mb-2">Total Points</div>
-            <div className="text-4xl font-bold text-blue-400">{totalPoints}</div>
+            <div className="flex items-center gap-3">
+              <div className="text-4xl font-bold text-blue-400">{totalPoints}</div>
+
+              <div className="relative group">
+                <div
+                  className="w-7 h-7 rounded-full bg-slate-700/60 border border-slate-600 flex items-center justify-center text-xs text-slate-200 font-semibold shadow-sm hover:bg-slate-700"
+                  aria-hidden
+                >
+                  i
+                </div>
+
+                <div
+                  className="pointer-events-none absolute right-0 bottom-full mb-3 w-64 rounded-md bg-slate-800 border border-slate-700 p-3 text-sm text-slate-200 shadow-lg opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150"
+                  role="tooltip"
+                >
+                  <div className="font-medium text-sm text-white mb-1">How team points work</div>
+                  <div className="text-slate-300 text-xs">
+                    Only unique challenge points are counted once per team. If multiple members solve the same
+                    challenge, its points are counted only one time for the team. Team solves are the number of
+                    unique challenges solved by the team.
+                  </div>
+                </div>
+              </div>
+            </div>
           </Card>
 
           <Card className="bg-slate-800 border-slate-700 p-6">
@@ -151,8 +215,13 @@ export default function DashboardPage() {
 
           <Card className="bg-slate-800 border-slate-700 p-6">
             <div className="text-slate-400 text-sm font-medium mb-2">Team</div>
-            <div className="text-xl font-bold text-purple-400">
-              {user?.team_name || 'Individual'}
+            <div className="text-xl font-bold text-purple-400 flex items-center gap-3">
+              <span>{user?.team_name || 'Individual'}</span>
+              {user?.team_name && teamScore != null && (
+                <span className="text-sm bg-purple-600/20 text-purple-200 px-2 py-1 rounded">
+                  {teamScore} pts
+                </span>
+              )}
             </div>
           </Card>
         </div>

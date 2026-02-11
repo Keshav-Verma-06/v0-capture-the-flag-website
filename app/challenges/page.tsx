@@ -154,7 +154,8 @@ export default function ChallengesPage() {
           <Link href="/dashboard">
             <Button
               variant="outline"
-              className="border-slate-600 text-slate-200 hover:bg-slate-800 whitespace-nowrap"
+              className="border border-slate-500 bg-slate-900 text-slate-100 px-4 py-2 rounded-md 
+hover:bg-slate-700 hover:border-slate-400 transition whitespace-nowrap"
             >
               ← Back to Dashboard
             </Button>
